@@ -106,36 +106,55 @@ const Attendance = () => {
                                 borderRadius: '0.75rem',
                                 border: 'none',
                                 cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
                                 transition: 'all 0.3s'
                             }}
-                            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >
-                            <span>+ Register Student</span>
+                            <span style={{ fontSize: '1.125rem' }}>+</span>
+                            <span>Register Student</span>
                         </button>
+
                         <button
-                            onClick={() => { localStorage.clear(); navigate('/'); }}
+                            onClick={() => navigate('/database')}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.5rem',
                                 padding: '0.75rem 1.25rem',
                                 background: 'white',
-                                color: '#6b7280',
+                                color: '#667eea',
                                 fontWeight: '600',
                                 fontSize: '0.875rem',
                                 borderRadius: '0.75rem',
-                                border: '2px solid rgba(156, 163, 175, 0.3)',
+                                border: '2px solid #667eea',
                                 cursor: 'pointer',
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-                                transition: 'all 0.3s',
-                                boxSizing: 'border-box'
+                                transition: 'all 0.3s'
                             }}
-                            onMouseOver={(e) => { e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.borderColor = '#dc2626'; }}
-                            onMouseOut={(e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = 'rgba(156, 163, 175, 0.3)'; }}
                         >
-                            <FiLogOut />
+                            <span>📊</span>
+                            <span>View Database</span>
+                        </button>
+
+                        <button
+                            onClick={handleLogout}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.75rem 1.25rem',
+                                background: 'white',
+                                color: '#ef4444',
+                                fontWeight: '600',
+                                fontSize: '0.875rem',
+                                borderRadius: '0.75rem',
+                                border: '2px solid #ef4444',
+                                cursor: 'pointer',
+                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                                transition: 'all 0.3s'
+                            }}
+                        >
+                            <span>🚪</span>
                             <span>Logout</span>
                         </button>
                     </div>

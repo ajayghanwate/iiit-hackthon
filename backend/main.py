@@ -21,8 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/teacher/signup")
-async def signup(auth: TeacherAuth):
+@app.post("/teacher/register")
+async def register_teacher(auth: TeacherAuth):
     try:
         res = db.supabase.auth.sign_up({
             "email": auth.email,
