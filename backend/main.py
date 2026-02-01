@@ -1,12 +1,28 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import database as db
 import face_engine
-from models import TeacherAuth, AttendanceResponse
+from models import TeacherAuth, AttendanceResponse, StudentUpdate
 import json
 
 app = FastAPI(title="AI Attendance System")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/students")
+async def get_students():
+    try:
+        res = db.supabase.table("students").select("*").order("name").execute()
+        return res.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.on_event("startup")
 async def startup_event():
@@ -30,7 +46,13 @@ async def signup(auth: TeacherAuth):
         })
         if res.user:
             # Sync to teachers table if needed
-            db.supabase.table("teachers").insert({"id": res.user.id, "email": auth.email}).execute()
+            db.supabase.table("teachers").insert({
+                "id": res.user.id, 
+                "email": auth.email,
+                "full_name": auth.full_name,
+                "class": auth.teacher_class,
+                "subject": auth.subject
+            }).execute()
             return {"message": "Teacher registered successfully", "user_id": res.user.id}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -128,6 +150,7 @@ async def mark_attendance(
         return {
             "session_id": session_id,
             "present_students": present_student_ids,
+            "present_names": present_student_names,
             "unknown_faces": unknown_faces,
             "status": "success"
         }
@@ -135,6 +158,39 @@ async def mark_attendance(
     except Exception as e:
         # Log failure if session exists
         # In a real app we'd handle session_id better here
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.patch("/students/{student_id}")
+async def update_student(student_id: str, student_data: StudentUpdate):
+    try:
+        # Filter out None values to allow partial updates
+        update_data = {k: v for k, v in student_data.dict().items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields provided for update")
+            
+        res = db.supabase.table("students").update(update_data).eq("id", student_id).execute()
+        
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Student not found")
+            
+        return {"message": "Student updated successfully", "data": res.data[0]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/students/{student_id}")
+async def delete_student(student_id: str):
+    try:
+        # We can either do a hard delete or just set is_active to False
+        # The user said "leave college permanently", sometimes hard delete is preferred
+        # but soft delete is safer. Let's do a hard delete as it's a "permanent" leave.
+        res = db.supabase.table("students").delete().eq("id", student_id).execute()
+        
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Student not found")
+            
+        return {"message": "Student removed from system permanently"}
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

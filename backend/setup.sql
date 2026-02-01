@@ -5,6 +5,9 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS teachers (
     id UUID PRIMARY KEY REFERENCES auth.users(id),
     email TEXT UNIQUE NOT NULL,
+    full_name TEXT,
+    class TEXT,
+    subject TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -13,6 +16,7 @@ CREATE TABLE IF NOT EXISTS students (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     roll_number TEXT UNIQUE NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -36,7 +40,7 @@ CREATE TABLE IF NOT EXISTS attendance_sessions (
 CREATE TABLE IF NOT EXISTS attendance_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID REFERENCES attendance_sessions(id) ON DELETE CASCADE,
-    student_id UUID REFERENCES students(id),
+    student_id UUID REFERENCES students(id) ON DELETE CASCADE,
     status TEXT DEFAULT 'present',
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -73,7 +77,8 @@ BEGIN
     1 - (se.embedding <=> query_embedding) AS similarity
   FROM student_embeddings se
   JOIN students s ON se.student_id = s.id
-  WHERE 1 - (se.embedding <=> query_embedding) > match_threshold
+  WHERE s.is_active = true 
+    AND 1 - (se.embedding <=> query_embedding) > match_threshold
   ORDER BY se.embedding <=> query_embedding
   LIMIT match_count;
 END;
