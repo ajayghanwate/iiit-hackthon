@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS attendance_logs (
     teacher_id UUID REFERENCES teachers(id),
     status TEXT,
     present_count INT,
+    student_names TEXT,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -59,6 +60,7 @@ CREATE OR REPLACE FUNCTION match_students (
 )
 RETURNS TABLE (
   student_id UUID,
+  student_name TEXT,
   similarity float
 )
 LANGUAGE plpgsql
@@ -67,8 +69,10 @@ BEGIN
   RETURN QUERY
   SELECT
     se.student_id,
+    s.name as student_name,
     1 - (se.embedding <=> query_embedding) AS similarity
   FROM student_embeddings se
+  JOIN students s ON se.student_id = s.id
   WHERE 1 - (se.embedding <=> query_embedding) > match_threshold
   ORDER BY se.embedding <=> query_embedding
   LIMIT match_count;
