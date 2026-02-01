@@ -100,6 +100,7 @@ async def mark_attendance(
         embeddings = face_engine.process_classroom_image(image_bytes)
         
         present_student_ids = []
+        present_student_names = []
         unknown_faces = 0
         
         # 3. Match each face with DB
@@ -107,8 +108,10 @@ async def mark_attendance(
             matches = db.get_student_by_embedding(emb)
             if matches:
                 student_id = matches[0]["student_id"]
+                student_name = matches[0]["student_name"]
                 if student_id not in present_student_ids:
                     present_student_ids.append(student_id)
+                    present_student_names.append(student_name)
                     db.mark_student_present(session_id, student_id)
             else:
                 unknown_faces += 1
@@ -118,7 +121,8 @@ async def mark_attendance(
             session_id=session_id,
             teacher_id=teacher_id,
             status="completed",
-            present_count=len(present_student_ids)
+            present_count=len(present_student_ids),
+            student_names=", ".join(present_student_names)
         )
         
         return {

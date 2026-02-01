@@ -3,6 +3,16 @@ import numpy as np
 from deepface import DeepFace
 import io
 from PIL import Image
+import tensorflow as tf
+
+# Allow memory growth so it doesn't grab everything at once
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(f"Memory growth error: {e}")
 
 # Global variable to hold the pre-loaded model
 _face_model = None
@@ -63,17 +73,23 @@ def get_single_face_embedding(image_bytes: bytes):
     try:
         img_array = _bytes_to_array(image_bytes)
         
-        results = DeepFace.represent(
-            img_path=img_array,
-            model_name="VGG-Face",
-            detector_backend="opencv",
-            enforce_detection=True
-        )
+        # We catch the exception from DeepFace to provide a better error message
+        try:
+            results = DeepFace.represent(
+                img_path=img_array,
+                model_name="VGG-Face",
+                detector_backend="opencv",
+                enforce_detection=True
+            )
+        except Exception as e:
+            if "Face could not be detected" in str(e):
+                raise ValueError("No face detected. Please ensure the photo is clear and the face is fully visible.")
+            raise e
         
         if len(results) == 0:
-            raise ValueError("No face detected")
+            raise ValueError("No face detected in the image.")
         if len(results) > 1:
-            raise ValueError("Multiple faces detected")
+            raise ValueError("Multiple faces detected. Please upload an image with only one face for registration.")
         
         return results[0]["embedding"]
     except Exception as e:
