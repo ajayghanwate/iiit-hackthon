@@ -42,11 +42,12 @@ def mark_student_present(session_id: str, student_id: str):
     }).execute()
     return response.data
 
-def log_attendance_attempt(session_id: str, teacher_id: str, status: str, present_count: int):
+def log_attendance_attempt(session_id: str, teacher_id: str, status: str, present_count: int, student_names: str = None):
     response = supabase.table("attendance_logs").insert({
         "session_id": session_id,
         "teacher_id": teacher_id,
         "status": status,
-        "present_count": present_count
+        "present_count": present_count,
+        "student_names": student_names
     }).execute()
     return response.data
