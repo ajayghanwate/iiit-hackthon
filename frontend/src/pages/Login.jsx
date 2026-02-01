@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiLock, FiArrowRight, FiUser, FiBook, FiLayers } from 'react-icons/fi';
 import { loginTeacher, registerTeacher } from '../services/api';
 
@@ -30,31 +29,20 @@ const Login = () => {
 
         try {
             if (isLogin) {
-                // LOGIN FLOW
-                if (!formData.email || !formData.password) {
-                    throw { message: 'Please enter your credentials.' };
-                }
+                if (!formData.email || !formData.password) throw { message: 'Please enter your credentials.' };
                 const data = await loginTeacher(formData.email, formData.password);
-
-                // Store minimal info
                 localStorage.setItem('teacher_id', data.teacher_id);
                 localStorage.setItem('teacher_name', data.name);
-
                 navigate('/attendance');
             } else {
-                // REGISTRATION FLOW
                 if (!formData.name || !formData.email || !formData.password || !formData.className || !formData.subject) {
                     throw { message: 'Please fill in all fields.' };
                 }
                 const data = await registerTeacher(formData);
-
-                // Auto-login after registration
                 localStorage.setItem('teacher_id', data.teacher_id);
                 localStorage.setItem('teacher_name', data.name);
-                // Save preferences for auto-fill
                 localStorage.setItem('default_subject', data.subject);
                 localStorage.setItem('default_class', data.className);
-
                 navigate('/attendance');
             }
         } catch (err) {
@@ -64,189 +52,323 @@ const Login = () => {
         }
     };
 
-    const toggleMode = () => {
-        setIsLogin(!isLogin);
-        setError(null);
-    };
-
     return (
-        <div className="flex min-h-screen items-center justify-center p-4">
-            <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="glass-card w-full max-w-md p-8 relative overflow-hidden"
-            >
-                {/* Decorative Elements */}
-                <div className="absolute -top-20 -left-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-                <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="layout-center">
+            {/* Card Container */}
+            <div className="glass-card" style={{
+                width: '100%',
+                maxWidth: '480px',
+                padding: '2rem 2rem',
+                boxSizing: 'border-box'
+            }}>
 
-                <div className="relative z-10">
-                    {/* Main Title */}
-                    <div className="text-center mb-6">
-                        <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                            TRUE-FACE
-                        </h1>
-                    </div>
-
-                    {/* Tabs */}
-                    <div className="flex bg-gray-100 p-1 rounded-xl mb-8 relative">
-                        <div
-                            className={`absolute w-1/2 h-full top-0 bg-white rounded-lg shadow-sm transition-all duration-300 ease-in-out transform ${isLogin ? 'left-0' : 'translate-x-full'}`}
-                            style={{ height: 'calc(100% - 8px)', margin: '4px', width: 'calc(50% - 8px)' }}
-                        />
-                        <button
-                            onClick={() => { setIsLogin(true); setError(null); }}
-                            className={`flex-1 relative z-10 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ${isLogin ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-                        >
-                            Sign In
-                        </button>
-                        <button
-                            onClick={() => { setIsLogin(false); setError(null); }}
-                            className={`flex-1 relative z-10 py-2 text-sm font-semibold rounded-lg transition-colors duration-300 ${!isLogin ? 'text-purple-600' : 'text-gray-500 hover:text-gray-700'}`}
-                        >
-                            Register
-                        </button>
-                    </div>
-
-                    <div className="text-center mb-6">
-                        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                            {isLogin ? 'Welcome Back' : 'Create Account'}
-                        </h2>
-                        <p className="text-gray-500 mt-2 text-sm">
-                            {isLogin ? 'Access TRUE-FACE Attendance' : 'Join as a new Teacher'}
-                        </p>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <AnimatePresence mode='wait'>
-                            {!isLogin && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="space-y-4 overflow-hidden"
-                                >
-                                    {/* Teacher Name */}
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1 ml-1">Full Name</label>
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <FiUser className="text-gray-400" />
-                                            </div>
-                                            <input
-                                                name="name"
-                                                type="text"
-                                                className="input-field pl-10"
-                                                placeholder="Dr. John Doe"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {/* Class */}
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1 ml-1">Class</label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <FiLayers className="text-gray-400" />
-                                                </div>
-                                                <input
-                                                    name="className"
-                                                    type="text"
-                                                    className="input-field pl-10"
-                                                    placeholder="CS-A"
-                                                    value={formData.className}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div>
-                                        {/* Subject */}
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1 ml-1">Subject</label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <FiBook className="text-gray-400" />
-                                                </div>
-                                                <input
-                                                    name="subject"
-                                                    type="text"
-                                                    className="input-field pl-10"
-                                                    placeholder="DBMS"
-                                                    value={formData.subject}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        {/* Email */}
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1 ml-1">Email Address</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FiMail className="text-gray-400" />
-                                </div>
-                                <input
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="input-field pl-10"
-                                    placeholder="name@college.edu"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Password */}
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase mb-1 ml-1">Password</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FiLock className="text-gray-400" />
-                                </div>
-                                <input
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="input-field pl-10"
-                                    placeholder="••••••••"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-3 rounded-lg bg-red-50/80 border border-red-100 text-red-600 text-sm font-medium text-center"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="btn-primary w-full flex items-center justify-center space-x-2 group mt-6"
-                        >
-                            <span>{loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}</span>
-                            {!loading && <FiArrowRight className="group-hover:translate-x-1 transition-transform" />}
-                        </button>
-                    </form>
-
-
+                {/* Header Section */}
+                <div className="text-center mb-6">
+                    <h1 style={{
+                        fontSize: '2rem',
+                        fontWeight: '800',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        marginBottom: '0.5rem',
+                        letterSpacing: '0.025em'
+                    }}>
+                        TRUE-FACE
+                    </h1>
+                    <p style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: '500' }}>
+                        {isLogin ? 'Welcome back, Educator' : 'Join the Future of Attendance'}
+                    </p>
                 </div>
-            </motion.div>
+
+                {/* Toggle Tabs */}
+                <div style={{
+                    display: 'flex',
+                    background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                    padding: '0.375rem',
+                    borderRadius: '0.875rem',
+                    marginBottom: '2rem',
+                    position: 'relative',
+                    border: '1px solid rgba(156, 163, 175, 0.2)',
+                    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)'
+                }}>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            width: 'calc(50% - 0.375rem)',
+                            height: 'calc(100% - 0.75rem)',
+                            top: '0.375rem',
+                            background: 'white',
+                            borderRadius: '0.625rem',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transform: isLogin ? 'translateX(0.375rem)' : 'translateX(calc(100% + 0.375rem))'
+                        }}
+                    />
+                    <button
+                        onClick={() => { setIsLogin(true); setError(null); }}
+                        style={{
+                            flex: 1,
+                            position: 'relative',
+                            zIndex: 10,
+                            padding: '0.625rem',
+                            fontSize: '0.875rem',
+                            fontWeight: '600',
+                            borderRadius: '0.625rem',
+                            transition: 'all 0.3s',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: isLogin ? '#667eea' : '#6b7280'
+                        }}
+                    >
+                        Sign In
+                    </button>
+                    <button
+                        onClick={() => { setIsLogin(false); setError(null); }}
+                        style={{
+                            flex: 1,
+                            position: 'relative',
+                            zIndex: 10,
+                            padding: '0.625rem',
+                            fontSize: '0.875rem',
+                            fontWeight: '600',
+                            borderRadius: '0.625rem',
+                            transition: 'all 0.3s',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: !isLogin ? '#764ba2' : '#6b7280'
+                        }}
+                    >
+                        Register
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+                    {!isLogin && (
+                        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <div className="input-wrapper">
+                                <label style={{
+                                    display: 'block',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '700',
+                                    textTransform: 'uppercase',
+                                    marginBottom: '0.5rem',
+                                    marginLeft: '0.25rem',
+                                    color: '#6366f1',
+                                    letterSpacing: '0.025em'
+                                }}>
+                                    👤 Full Name
+                                </label>
+                                <div style={{ position: 'relative' }}>
+                                    <FiUser style={{
+                                        position: 'absolute',
+                                        left: '1rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '1.25rem',
+                                        height: '1.25rem',
+                                        pointerEvents: 'none',
+                                        color: '#818cf8'
+                                    }} />
+                                    <input
+                                        name="name"
+                                        type="text"
+                                        className="input-field"
+                                        style={{ paddingLeft: '3rem' }}
+                                        placeholder="Dr. Alex Carter"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="input-wrapper">
+                                    <label style={{
+                                        display: 'block',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '700',
+                                        textTransform: 'uppercase',
+                                        marginBottom: '0.5rem',
+                                        marginLeft: '0.25rem',
+                                        color: '#8b5cf6',
+                                        letterSpacing: '0.025em'
+                                    }}>
+                                        📚 Class
+                                    </label>
+                                    <div style={{ position: 'relative' }}>
+                                        <FiLayers style={{
+                                            position: 'absolute',
+                                            left: '1rem',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            width: '1.25rem',
+                                            height: '1.25rem',
+                                            pointerEvents: 'none',
+                                            color: '#a78bfa'
+                                        }} />
+                                        <input
+                                            name="className"
+                                            type="text"
+                                            className="input-field"
+                                            style={{ paddingLeft: '3rem' }}
+                                            placeholder="CS-A"
+                                            value={formData.className}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="input-wrapper">
+                                    <label style={{
+                                        display: 'block',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '700',
+                                        textTransform: 'uppercase',
+                                        marginBottom: '0.5rem',
+                                        marginLeft: '0.25rem',
+                                        color: '#ec4899',
+                                        letterSpacing: '0.025em'
+                                    }}>
+                                        📖 Subject
+                                    </label>
+                                    <div style={{ position: 'relative' }}>
+                                        <FiBook style={{
+                                            position: 'absolute',
+                                            left: '1rem',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            width: '1.25rem',
+                                            height: '1.25rem',
+                                            pointerEvents: 'none',
+                                            color: '#f472b6'
+                                        }} />
+                                        <input
+                                            name="subject"
+                                            type="text"
+                                            className="input-field"
+                                            style={{ paddingLeft: '3rem' }}
+                                            placeholder="DBMS"
+                                            value={formData.subject}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="input-wrapper delay-100 animate-slide-up" style={{ animationFillMode: 'backwards' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '0.75rem',
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            marginBottom: '0.5rem',
+                            marginLeft: '0.25rem',
+                            color: '#3b82f6',
+                            letterSpacing: '0.025em'
+                        }}>
+                            ✉️ Email Address
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <FiMail style={{
+                                position: 'absolute',
+                                left: '1rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                width: '1.25rem',
+                                height: '1.25rem',
+                                pointerEvents: 'none',
+                                color: '#60a5fa'
+                            }} />
+                            <input
+                                name="email"
+                                type="email"
+                                required
+                                className="input-field"
+                                style={{ paddingLeft: '3rem' }}
+                                placeholder="name@college.edu"
+                                value={formData.email}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="input-wrapper delay-200 animate-slide-up" style={{ animationFillMode: 'backwards' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '0.75rem',
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            marginBottom: '0.5rem',
+                            marginLeft: '0.25rem',
+                            color: '#10b981',
+                            letterSpacing: '0.025em'
+                        }}>
+                            🔒 Password
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <FiLock style={{
+                                position: 'absolute',
+                                left: '1rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                width: '1.25rem',
+                                height: '1.25rem',
+                                pointerEvents: 'none',
+                                color: '#34d399'
+                            }} />
+                            <input
+                                name="password"
+                                type="password"
+                                required
+                                className="input-field"
+                                style={{ paddingLeft: '3rem' }}
+                                placeholder="••••••••"
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    {error && (
+                        <div className="animate-fade-in" style={{
+                            padding: '0.875rem',
+                            borderRadius: '0.75rem',
+                            background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                            border: '1px solid #fecaca',
+                            color: '#dc2626',
+                            fontSize: '0.875rem',
+                            fontWeight: '500',
+                            textAlign: 'center',
+                            boxShadow: '0 1px 3px rgba(220, 38, 38, 0.1)'
+                        }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn-primary delay-300 animate-slide-up"
+                        style={{ animationFillMode: 'backwards', marginTop: '0.5rem' }}
+                    >
+                        <span>{loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}</span>
+                        {!loading && <FiArrowRight style={{ width: '1.25rem', height: '1.25rem' }} />}
+                    </button>
+                </form>
+
+                {/* Footer */}
+                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: '500' }}>
+                        © 2026 True-Face Systems
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };

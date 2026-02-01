@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Attendance from './pages/Attendance';
 
+import StudentRegister from './pages/StudentRegister';
+
 function App() {
   return (
     <Router>
@@ -10,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/students/register" element={<StudentRegister />} />
           {/* Default redirect to login */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

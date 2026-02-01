@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000'; // Replace with actual backend URL if different
+const API_BASE_URL = 'http://localhost:8000'; // Match FastAPI port
 
 // MOCK MODE: Set to true to bypass backend
 const MOCK_MODE = true;
@@ -30,6 +30,32 @@ export const registerTeacher = async (teacherData) => {
 
     try {
         const response = await api.post('/teacher/register', teacherData);
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : { message: 'Network Error' };
+    }
+};
+
+export const registerStudent = async (studentData) => {
+    // studentData should be FormData containing name, roll_number, face_image
+    if (MOCK_MODE) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    success: true,
+                    message: "Student registered successfully",
+                    student_id: 'mock-student-' + Date.now()
+                });
+            }, 1000);
+        });
+    }
+
+    try {
+        const response = await api.post('/students/register', studentData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : { message: 'Network Error' };

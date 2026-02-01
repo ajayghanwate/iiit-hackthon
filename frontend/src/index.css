@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,16 +24,149 @@ body {
 
 @layer components {
     .glass-card {
-        @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow:
+            0 8px 32px 0 rgba(31, 38, 135, 0.15),
+            0 2px 8px 0 rgba(0, 0, 0, 0.05),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+        border-radius: 1.5rem;
+        overflow: visible;
+        box-sizing: border-box;
     }
 
     .btn-primary {
-        @apply bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        border: none;
+        box-shadow:
+            0 4px 15px rgba(102, 126, 234, 0.4),
+            0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        letter-spacing: 0.025em;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 6px 20px rgba(102, 126, 234, 0.5),
+            0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .input-wrapper {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .input-wrapper:focus-within {
+        transform: translateY(-2px);
     }
 
     .input-field {
-        @apply w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 placeholder-gray-400 backdrop-blur-sm;
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background-color: #ffffff;
+        border: 2px solid rgba(156, 163, 175, 0.3);
+        color: #1f2937;
+        border-radius: 0.875rem;
+        outline: none;
+        transition: all 0.3s ease-in-out;
+        box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 1px 2px rgba(0, 0, 0, 0.03);
+        font-size: 0.95rem;
+        font-weight: 500;
+        box-sizing: border-box;
     }
+
+    .input-field:focus {
+        background-color: #ffffff;
+        border-color: #a78bfa;
+        box-shadow:
+            0 0 0 4px rgba(168, 85, 247, 0.1),
+            0 2px 8px rgba(168, 85, 247, 0.15);
+    }
+
+    .input-field::placeholder {
+        color: #9ca3af;
+        font-size: 0.9rem;
+        font-weight: 400;
+    }
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
+}
+
+
+.layout-center {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
 }
 
 /* Custom Scrollbar */
