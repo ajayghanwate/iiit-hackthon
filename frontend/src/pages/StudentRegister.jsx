@@ -90,11 +90,7 @@ const StudentRegister = () => {
                 </div>
 
                 {/* Main Content */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    gap: '2rem'
-                }}>
+                <div className="responsive-grid">
                     {/* Left Column: Input Form */}
                     <div>
                         <div className="glass-card" style={{ padding: '2rem', boxSizing: 'border-box' }}>

@@ -142,11 +142,7 @@ const Attendance = () => {
                 </div>
 
                 {/* Main Content */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    gap: '2rem'
-                }}>
+                <div className="responsive-grid">
                     {/* Left Column: Input & Results */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <div className="glass-card" style={{ padding: '2rem', boxSizing: 'border-box' }}>

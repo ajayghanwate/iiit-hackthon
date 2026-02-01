@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Attendance from './pages/Attendance';
-
 import StudentRegister from './pages/StudentRegister';
+import DatabaseViewer from './pages/DatabaseViewer';
 
 function App() {
   return (
@@ -13,6 +13,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/students/register" element={<StudentRegister />} />
+          <Route path="/database" element={<DatabaseViewer />} />
           {/* Default redirect to login */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -186,3 +186,35 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #a0aec0;
 }
+
+/* Mobile Responsive Grid */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-grid {
+        gap: 1rem;
+    }
+
+    .layout-center {
+        padding: 0.5rem;
+    }
+
+    .glass-card {
+        border-radius: 1rem;
+        padding: 1.5rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .layout-center {
+        padding: 0.25rem;
+    }
+
+    .responsive-grid {
+        gap: 0.75rem;
+    }
+}

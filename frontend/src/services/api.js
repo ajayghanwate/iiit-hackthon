@@ -13,16 +13,29 @@ export const registerTeacher = async (teacherData) => {
     if (MOCK_MODE) {
         return new Promise((resolve) => {
             setTimeout(() => {
-                // In a real app, you'd save this to DB. 
-                // Here we just return success and the mock ID.
-                resolve({
-                    success: true,
-                    message: "Registration successful",
-                    teacher_id: 'mock-teacher-' + Date.now(),
+                const teacherId = 'teacher-' + Date.now();
+                const teacher = {
+                    teacher_id: teacherId,
                     name: teacherData.name,
                     email: teacherData.email,
                     subject: teacherData.subject,
-                    className: teacherData.className
+                    className: teacherData.className,
+                    password: teacherData.password
+                };
+
+                // Save to localStorage
+                const teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+                teachers.push(teacher);
+                localStorage.setItem('teachers', JSON.stringify(teachers));
+
+                resolve({
+                    success: true,
+                    message: "Registration successful",
+                    teacher_id: teacherId,
+                    name: teacher.name,
+                    email: teacher.email,
+                    subject: teacher.subject,
+                    className: teacher.className
                 });
             }, 1000);
         });
@@ -41,10 +54,23 @@ export const registerStudent = async (studentData) => {
     if (MOCK_MODE) {
         return new Promise((resolve) => {
             setTimeout(() => {
+                const studentId = 'student-' + Date.now();
+                const student = {
+                    student_id: studentId,
+                    name: studentData.get('name'),
+                    roll_number: studentData.get('roll_number'),
+                    registered_at: new Date().toISOString()
+                };
+
+                // Save to localStorage
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                students.push(student);
+                localStorage.setItem('students', JSON.stringify(students));
+
                 resolve({
                     success: true,
                     message: "Student registered successfully",
-                    student_id: 'mock-student-' + Date.now()
+                    student_id: studentId
                 });
             }, 1000);
         });
@@ -66,8 +92,18 @@ export const loginTeacher = async (email, password) => {
     if (MOCK_MODE) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                if (email && password) {
-                    resolve({ teacher_id: 'mock-teacher-123', name: 'Demo Teacher' });
+                // Check localStorage for registered teachers
+                const teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+                const teacher = teachers.find(t => t.email === email && t.password === password);
+
+                if (teacher) {
+                    resolve({
+                        teacher_id: teacher.teacher_id,
+                        name: teacher.name
+                    });
+                } else if (email && password) {
+                    // Fallback for demo
+                    resolve({ teacher_id: 'demo-teacher-123', name: 'Demo Teacher' });
                 } else {
                     reject({ message: 'Invalid credentials' });
                 }
@@ -87,11 +123,26 @@ export const markAttendance = async (formData) => {
     if (MOCK_MODE) {
         return new Promise((resolve) => {
             setTimeout(() => {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                const presentCount = students.length > 0 ? students.length : Math.floor(Math.random() * 10) + 20;
+
+                const attendance = {
+                    session_id: 'session-' + Date.now(),
+                    subject: formData.get('subject'),
+                    present_count: presentCount,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Save attendance record
+                const records = JSON.parse(localStorage.getItem('attendance_records') || '[]');
+                records.push(attendance);
+                localStorage.setItem('attendance_records', JSON.stringify(records));
+
                 resolve({
                     success: true,
-                    subject: formData.get('subject'),
-                    present_count: Math.floor(Math.random() * 10) + 20, // Random count between 20-30
-                    timestamp: new Date().toISOString()
+                    subject: attendance.subject,
+                    present_count: presentCount,
+                    timestamp: attendance.timestamp
                 });
             }, 1500);
         });
